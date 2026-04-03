@@ -1,9 +1,9 @@
-import { IsString, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsString, MaxLength } from 'class-validator';
 
-export class BookCategoryCreateAdminDto{
-  @IsString()
+export class BookCategoryCreateAdminDto {
   @ApiProperty()
-  @MaxLength(256)
-  title! : string
+  @IsString()
+  @MaxLength(64)
+  title: string;
 }

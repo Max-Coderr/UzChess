@@ -1,36 +1,50 @@
-import { Body, Controller, Get, NotFoundException, Param, Post } from '@nestjs/common';
-import { ApiOkResponse } from '@nestjs/swagger';
-import { BookCategoryListAdminDto } from '../../dtos/bookCategories/admin/bookCategory.list.admin.dto';
-import { BookCategory } from '../../entities/bookCategory.entity';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
-import { NewsDetailAdminDto } from '../../../news/dtos/news/admin/news.detail.admin.dto';
+import { Roles } from '../../../../core/decorators/roles.decorator';
+import { Role } from '../../../../core/enums/role.enum';
+import { BookCategoryAdminService } from '../../service/bookCategories/bookCategory.admin.service';
 import { BookCategoryCreateAdminDto } from '../../dtos/bookCategories/admin/bookCategory.create.admin.dto';
+import { BookCategoryUpdateAdminDto } from '../../dtos/bookCategories/admin/bookCategory.update.admin.dto';
+import { BookCategoryListAdminDto } from '../../dtos/bookCategories/admin/bookCategory.list.admin.dto';
 
+@ApiTags('Book Categories - Admin')
+@ApiBearerAuth()
+@Controller('admin/book-categories')
+@Roles(Role.admin, Role.superAdmin)
+export class BookCategoryAdminController {
+  constructor(private readonly service: BookCategoryAdminService) {}
 
-@Controller('admin/bookCategory')
-export class bookCategoryAdminController {
   @Get()
-  @ApiOkResponse({type : () => BookCategoryListAdminDto})
-  async getAll(){
-    const bookCategory = await BookCategory.find()
-    return plainToInstance(BookCategoryListAdminDto,bookCategory,{excludeExtraneousValues : true})
+  @ApiOkResponse({ type: () => BookCategoryListAdminDto, isArray: true })
+  async getAll() {
+    const items = await this.service.findAll();
+    return plainToInstance(BookCategoryListAdminDto, items, { excludeExtraneousValues: true });
   }
 
   @Get(':id')
-  @ApiOkResponse({type : () => NewsDetailAdminDto})
-  async getOne(@Param('id')id: number){
-    const bookCategories = await BookCategory.findOneBy(({ id : id}))
-    if(!bookCategories){
-      throw new NotFoundException('BookCategory with given id not found')
-    }
-    return bookCategories
+  @ApiOkResponse({ type: () => BookCategoryListAdminDto })
+  async getOne(@Param('id', ParseIntPipe) id: number) {
+    const item = await this.service.findOne(id);
+    return plainToInstance(BookCategoryListAdminDto, item, { excludeExtraneousValues: true });
   }
 
   @Post()
-  async create(@Body()payload: BookCategoryCreateAdminDto){
-    const bookCategories = BookCategory.create(payload as BookCategory)
-    bookCategories.createdAt = (new Date()).toISOString()
-    await BookCategory.save(bookCategories)
-    return bookCategories
+  @ApiOkResponse({ type: () => BookCategoryListAdminDto })
+  async create(@Body() dto: BookCategoryCreateAdminDto) {
+    const item = await this.service.create(dto);
+    return plainToInstance(BookCategoryListAdminDto, item, { excludeExtraneousValues: true });
+  }
+
+  @Put(':id')
+  @ApiOkResponse({ type: () => BookCategoryListAdminDto })
+  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: BookCategoryUpdateAdminDto) {
+    const item = await this.service.update(id, dto);
+    return plainToInstance(BookCategoryListAdminDto, item, { excludeExtraneousValues: true });
+  }
+
+  @Delete(':id')
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.service.remove(id);
   }
 }
