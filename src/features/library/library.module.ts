@@ -10,4 +10,4 @@ import { BookCategoryPublicService } from './service/bookCategories/bookCategory
   controllers: [BookCategoryAdminController, BookCategoryPublicController],
   providers: [BookCategoryAdminService, BookCategoryPublicService],
 })
-export class BookModule {}
+export class LibraryModule {}
