@@ -14,6 +14,6 @@ import { LibraryModule } from './features/library/library.module';
     CommonModule,
     AuthorModule,
     NewsModule,
-    LibraryModule
+    LibraryModule]
 })
 export class AppModule {}
