@@ -1,0 +1,11 @@
+GET http://localhost:3000/admin/news
+
+###
+POST http://localhost:3000/admin/news
+Content-Type: application/json
+
+{
+  "title" : "Title 1",
+  "date" : "2026-03-17T10:50:00.000Z",
+  "content" : "Ko'ring faqat yig'lamang! Mana Sizga api"
+}
