@@ -1,46 +1,41 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { plainToInstance } from 'class-transformer';
-import { Roles } from '../../../../core/decorators/roles.decorator';
-import { Role } from '../../../../core/enums/role.enum';
+import { Controller, Get, Post, Put, Delete, Param, Body, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { DifficultyAdminService } from '../../service/difficulties/difficulty.admin.service';
-import { DifficultyListAdminDto } from '../../dtos/difficulties/admin/difficulty.list.admin.dto';
 import { DifficultyCreateAdminDto } from '../../dtos/difficulties/admin/difficulty.create.admin.dto';
 import { DifficultyUpdateAdminDto } from '../../dtos/difficulties/admin/difficulty.update.admin.dto';
 
-@ApiTags('Difficulties - Admin')
-@ApiBearerAuth()
 @Controller('admin/difficulties')
-@Roles(Role.admin, Role.superAdmin)
 export class DifficultyAdminController {
   constructor(private readonly service: DifficultyAdminService) {}
 
+  @Post()
+  @UseInterceptors(FileInterceptor('icon'))
+  create(@Body() payload: DifficultyCreateAdminDto, @UploadedFile() icon: Express.Multer.File) {
+    return this.service.create(payload, icon);
+  }
+
   @Get()
-  @ApiOkResponse({ type: () => DifficultyListAdminDto, isArray: true })
-  async getAll() {
-    const difficulties = await this.service.findAll();
-    return plainToInstance(DifficultyListAdminDto, difficulties, { excludeExtraneousValues: true });
+  findAll() {
+    return this.service.getAll();
   }
 
   @Get(':id')
-  @ApiOkResponse({ type: () => DifficultyListAdminDto })
-  async getOne(@Param('id', ParseIntPipe) id: number) {
-    const difficulty = await this.service.findOne(id);
-    return plainToInstance(DifficultyListAdminDto, difficulty, { excludeExtraneousValues: true });
+  findOne(@Param('id') id: number) {
+    return this.service.getOne(id);
   }
 
-  @Post()
-  async create(@Body() payload: DifficultyCreateAdminDto) {
-    return this.service.create(payload);
-  }
-
-  @Patch(':id')
-  async update(@Param('id', ParseIntPipe) id: number, @Body() payload: DifficultyUpdateAdminDto) {
-    return this.service.update(id, payload);
+  @Put(':id')
+  @UseInterceptors(FileInterceptor('icon'))
+  update(
+    @Param('id') id: number,
+    @Body() payload: DifficultyUpdateAdminDto,
+    @UploadedFile() icon: Express.Multer.File,
+  ) {
+    return this.service.update(id, payload, icon);
   }
 
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    return this.service.remove(id);
+  remove(@Param('id') id: number) {
+    return this.service.delete(id);
   }
 }

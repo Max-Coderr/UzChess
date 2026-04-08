@@ -52,7 +52,8 @@ import { PurchasedCoursePublicService } from './service/purchasedCourse/purchase
   providers: [
     CourseCategoriesAdminService,
     CourseCategoriesPublicService,
-    CoursesAdminService,    CoursesPublicService,
+    CoursesAdminService,
+    CoursesPublicService,
     CourseSectionsAdminService,
     CourseSectionsPublicService,
     CourseLessonsAdminService,

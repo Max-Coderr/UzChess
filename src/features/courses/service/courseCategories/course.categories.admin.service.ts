@@ -1,20 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CourseCategory } from '../../entities/course.category.entity';
 
-
 @Injectable()
 export class CourseCategoriesAdminService {
   async create(payload: any) {
-    const category = CourseCategory.create(payload);
+    const category = CourseCategory.create(payload as CourseCategory);
     await CourseCategory.save(category);
     return category;
   }
 
-  async getAll() {
-    return await CourseCategory.find();
+  async findAll() {
+    return CourseCategory.find();
   }
 
-  async getOne(id: number) {
+  async findOne(id: number) {
     const category = await CourseCategory.findOneBy({ id });
     if (!category) {
       throw new NotFoundException('Course category with given id not found');
@@ -22,16 +21,15 @@ export class CourseCategoriesAdminService {
     return category;
   }
 
-  async updateOne(id: number, payload: any) {
-    const category = await this.getOne(id);
+  async update(id: number, payload: any) {
+    const category = await this.findOne(id);
     Object.assign(category, payload);
     await CourseCategory.save(category);
     return category;
   }
 
-  async deleteOne(id: number) {
-    const category = await this.getOne(id);
+  async remove(id: number) {
+    const category = await this.findOne(id);
     await CourseCategory.remove(category);
-    return true;
   }
 }
